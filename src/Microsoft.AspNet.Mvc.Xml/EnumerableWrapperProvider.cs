@@ -3,33 +3,52 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Microsoft.AspNet.Mvc.Xml
 {
+    /// <summary>
+    /// Provides a <see cref="IWrapperProvider"/> for interface types which implement 
+    /// <see cref="IEnumerable{T}"/>.
+    /// </summary>
     public class EnumerableWrapperProvider : IWrapperProvider
     {
-        private readonly WrapperProviderContext _context;
-        private readonly Type _sourceEnumerableOfT;
-        private readonly IEnumerable<IWrapperProviderFactory> _wrapperProviderFactories;
+        private readonly IWrapperProvider _wrapperProvider;
+        private readonly ConstructorInfo _wrappingTypeConstructor;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="EnumerableWrapperProvider"/>.
+        /// </summary>
+        /// <param name="sourceEnumerableOfT">Type of the original <see cref="IEnumerable{T}" /> 
+        /// that is being wrapped.</param>
+        /// <param name="elementWrapperProvider">The <see cref="IWrapperProvider"/> for the element type.
+        /// Can be null.</param>
         public EnumerableWrapperProvider(
             [NotNull] Type sourceEnumerableOfT,
-            [NotNull] IEnumerable<IWrapperProviderFactory> wrapperProviderFactories,
-            [NotNull] WrapperProviderContext context)
+            IWrapperProvider elementWrapperProvider)
         {
-            _sourceEnumerableOfT = sourceEnumerableOfT;
-            _wrapperProviderFactories = wrapperProviderFactories;
-            _context = context;
+            Type declaredElementType;
+            if (GetIEnumerableOfT(sourceEnumerableOfT, out declaredElementType) == null)
+            {
+                throw new ArgumentException(
+                    Resources.FormatEnumerableWrapperProvider_InvalidSourceEnumerableOfT(nameof(sourceEnumerableOfT)));
+            }
+
+            _wrapperProvider = elementWrapperProvider;
+
+            var wrappedElementType = elementWrapperProvider?.WrappingType ?? declaredElementType;
+
+            WrappingType = typeof(DelegatingEnumerable<,>).MakeGenericType(wrappedElementType, declaredElementType);
+
+            _wrappingTypeConstructor = WrappingType.GetConstructor(new[] {
+                                                            sourceEnumerableOfT,
+                                                            typeof(IWrapperProvider) });
         }
 
         /// <inheritdoc />
         public Type WrappingType
         {
-            get
-            {
-                IWrapperProvider elementWrapperProvider = null;
-                return GetWrappingEnumerableOfT(out elementWrapperProvider);
-            }
+            get;
         }
 
         /// <inheritdoc />
@@ -40,34 +59,23 @@ namespace Microsoft.AspNet.Mvc.Xml
                 return null;
             }
 
-            IWrapperProvider elementWrapperProvider;
-            var wrappingEnumerableType = GetWrappingEnumerableOfT(out elementWrapperProvider);
-
-            var wrappingEnumerableTypeConstructor = wrappingEnumerableType.GetConstructor(new[]
-                                                                                        {
-                                                                                            _sourceEnumerableOfT,
-                                                                                            typeof(IWrapperProvider)
-                                                                                        });
-
-            return wrappingEnumerableTypeConstructor.Invoke(new object[] { original, elementWrapperProvider });
+            return _wrappingTypeConstructor.Invoke(new object[] { original, _wrapperProvider });
         }
 
-        private Type GetWrappingEnumerableOfT(out IWrapperProvider elementWrapperProvider)
+        public static Type GetIEnumerableOfT(Type declaredType, out Type elementType)
         {
-            var declaredElementType = _sourceEnumerableOfT.GetGenericArguments()[0];
-
-            // Since the T itself could be wrapped, get the wrapping type for it
-            var wrapperProviderContext = new WrapperProviderContext(declaredElementType, _context.IsSerialization);
-
-            var wrappedElementType = declaredElementType;
-
-            elementWrapperProvider = FormattingUtilities.GetWrapperProvider(_wrapperProviderFactories, wrapperProviderContext);
-            if (elementWrapperProvider != null && elementWrapperProvider.WrappingType != null)
+            elementType = null;
+            if (declaredType != null && declaredType.IsInterface() && declaredType.IsGenericType())
             {
-                wrappedElementType = elementWrapperProvider.WrappingType;
+                var enumerableOfT = declaredType.ExtractGenericInterface(typeof(IEnumerable<>));
+                if(enumerableOfT != null)
+                {
+                    elementType = enumerableOfT.GetGenericArguments()[0];
+                    return enumerableOfT;
+                }
             }
 
-            return typeof(DelegatingEnumerable<,>).MakeGenericType(wrappedElementType, declaredElementType);
+            return null;
         }
     }
 }

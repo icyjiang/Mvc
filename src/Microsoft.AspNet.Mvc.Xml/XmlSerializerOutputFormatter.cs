@@ -99,8 +99,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <returns>The original or wrapped type provided by any <see cref="IWrapperProvider"/>.</returns>
         protected virtual Type GetSerializableType(Type type)
         {
-            IWrapperProvider wrapperProvider = FormattingUtilities.GetWrapperProvider(
-                                                        _wrapperProviderFactories,
+            IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
                                                         new WrapperProviderContext(type, isSerialization: true));
 
             if (wrapperProvider != null && wrapperProvider.WrappingType != null)
@@ -173,8 +172,7 @@ namespace Microsoft.AspNet.Mvc.Xml
                 // Wrap the object only if there is a wrapping type.
                 if (wrappingType != null && wrappingType != resolvedType)
                 {
-                    IWrapperProvider wrapperProvider = FormattingUtilities.GetWrapperProvider(
-                                                            _wrapperProviderFactories,
+                    IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
                                                             new WrapperProviderContext(
                                                                                 declaredType: resolvedType,
                                                                                 isSerialization: true));

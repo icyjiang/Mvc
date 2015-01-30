@@ -155,8 +155,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <returns>The type to which the XML will be deserialized.</returns>
         protected virtual Type GetSerializableType([NotNull] Type declaredType)
         {
-            IWrapperProvider wrapperProvider = FormattingUtilities.GetWrapperProvider(
-                                                    _wrapperProviderFactories,
+            IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
                                                     new WrapperProviderContext(declaredType, isSerialization: false));
 
             if (wrapperProvider != null && wrapperProvider.WrappingType != null)

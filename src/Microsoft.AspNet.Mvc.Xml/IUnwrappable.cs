@@ -11,7 +11,7 @@ namespace Microsoft.AspNet.Mvc.Xml
     public interface IUnwrappable
     {
         /// <summary>
-        /// Unwraps an object
+        /// Unwraps an object.
         /// </summary>
         /// <param name="declaredType">The type to which the object should be un-wrapped to.</param>
         /// <returns>The un-wrapped object.</returns>

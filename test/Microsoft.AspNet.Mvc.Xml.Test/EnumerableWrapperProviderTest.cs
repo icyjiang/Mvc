@@ -24,11 +24,9 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void Gets_DelegatingWrappingType(Type declaredEnumerableOfT, Type expectedType)
         {
             // Arrange
-            var wrapperProviderFactories = GetWrapperProviderFactories();
             var wrapperProvider = new EnumerableWrapperProvider(
-                                        declaredEnumerableOfT,
-                                        wrapperProviderFactories,
-                                        new WrapperProviderContext(declaredEnumerableOfT, isSerialization: true));
+                                                            declaredEnumerableOfT,
+                                                            new SerializableErrorWrapperProvider());
 
             // Act
             var wrappingType = wrapperProvider.WrappingType;
@@ -43,11 +41,9 @@ namespace Microsoft.AspNet.Mvc.Xml
         {
             // Arrange
             var declaredEnumerableOfT = typeof(IEnumerable<int>);
-            var wrapperProviderFactories = GetWrapperProviderFactories();
             var wrapperProvider = new EnumerableWrapperProvider(
-                                        declaredEnumerableOfT,
-                                        wrapperProviderFactories,
-                                        new WrapperProviderContext(declaredEnumerableOfT, isSerialization: true));
+                                                declaredEnumerableOfT,
+                                                elementWrapperProvider: null);
 
             // Act
             var wrapped = wrapperProvider.Wrap(new int[] { });
@@ -65,11 +61,9 @@ namespace Microsoft.AspNet.Mvc.Xml
         {
             // Arrange
             var declaredEnumerableOfT = typeof(IEnumerable<int>);
-            var wrapperProviderFactories = GetWrapperProviderFactories();
             var wrapperProvider = new EnumerableWrapperProvider(
                                         declaredEnumerableOfT,
-                                        wrapperProviderFactories,
-                                        new WrapperProviderContext(declaredEnumerableOfT, isSerialization: true));
+                                        elementWrapperProvider: null);
 
             // Act
             var wrapped = wrapperProvider.Wrap(null);
@@ -78,14 +72,26 @@ namespace Microsoft.AspNet.Mvc.Xml
             Assert.Equal(typeof(DelegatingEnumerable<int, int>), wrapperProvider.WrappingType);
             Assert.Null(wrapped);
         }
-
-        private IEnumerable<IWrapperProviderFactory> GetWrapperProviderFactories()
+        
+        [Theory]
+        [InlineData(typeof(string))]
+        [InlineData(typeof(List<int>))]
+        [InlineData(typeof(List<Person>))]
+        [InlineData(typeof(List<SerializableError>))]
+        [InlineData(typeof(PersonList))]
+        public void ThrowsArugmentExceptionFor_ConcreteEnumerableOfT(Type declaredType)
         {
-            var wrapperProviderFactories = new List<IWrapperProviderFactory>();
-            wrapperProviderFactories.Add(new EnumerableWrapperProviderFactory(wrapperProviderFactories));
-            wrapperProviderFactories.Add(new SerializableErrorWrapperProviderFactory());
+            // Arrange
+            var expectedMessage = "Invalid argument supplied to parameter 'sourceEnumerableOfT'." +
+                                  " The expected argument for this parameter is a type which is " + 
+                                  "an interface and implements IEnumerable<T>.";
 
-            return wrapperProviderFactories;
+            // Act and Assert
+            var ex = Assert.Throws<ArgumentException>(() => new EnumerableWrapperProvider(
+                                                                            declaredType, 
+                                                                            elementWrapperProvider: null));
+
+            Assert.Equal(expectedMessage, ex.Message);
         }
     }
 }

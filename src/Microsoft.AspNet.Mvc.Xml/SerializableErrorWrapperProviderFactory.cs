@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         {
             if (context.DeclaredType == typeof(SerializableError))
             {
-                return new SerializableErrorWrapperProvider(context);
+                return new SerializableErrorWrapperProvider();
             }
 
             return null;

@@ -52,13 +52,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         {
             get
             {
-                var obj = _inner.Current;
-                if (_wrapperProvider == null)
-                {
-                    return obj;
-                }
-
-               return _wrapperProvider.Wrap(obj); 
+                return Current;
             }
         }
 

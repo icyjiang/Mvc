@@ -15,8 +15,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void Gets_SerializableErrorWrapper_AsWrappingType(bool isSerialization)
         {
             // Arrange
-            var wrapperProvider = new SerializableErrorWrapperProvider(
-                                        new WrapperProviderContext(typeof(SerializableError), isSerialization));
+            var wrapperProvider = new SerializableErrorWrapperProvider();
 
             // Act and Assert
             Assert.Equal(typeof(SerializableErrorWrapper), wrapperProvider.WrappingType);
@@ -26,8 +25,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void Wraps_SerializableErrorInstance()
         {
             // Arrange
-            var wrapperProvider = new SerializableErrorWrapperProvider(
-                                        new WrapperProviderContext(typeof(SerializableError), isSerialization: true));
+            var wrapperProvider = new SerializableErrorWrapperProvider();
             var serializableError = new SerializableError();
 
             // Act
@@ -44,8 +42,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void DoesNotWrap_NullInstance()
         {
             // Arrange
-            var wrapperProvider = new SerializableErrorWrapperProvider(
-                                        new WrapperProviderContext(typeof(SerializableError), isSerialization: true));
+            var wrapperProvider = new SerializableErrorWrapperProvider();
             
             // Act
             var wrapped = wrapperProvider.Wrap(null);
@@ -58,8 +55,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void DoesNotWrap_NonSerializableErrorInstances()
         {
             // Arrange
-            var wrapperProvider = new SerializableErrorWrapperProvider(
-                                        new WrapperProviderContext(typeof(SerializableError), isSerialization: true));
+            var wrapperProvider = new SerializableErrorWrapperProvider();
             var person = new Person() { Id = 10, Name = "John" };
 
             // Act
@@ -67,13 +63,6 @@ namespace Microsoft.AspNet.Mvc.Xml
 
             // Assert
             Assert.Same(person, wrapped);
-        }
-
-        internal class Person
-        {
-            public int Id { get; set; }
-
-            public string Name { get; set; }
         }
     }
 }

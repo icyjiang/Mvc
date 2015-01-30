@@ -37,11 +37,11 @@ namespace Microsoft.AspNet.Mvc.Xml
         ///  <see cref="IEnumerable{T}"/> and the wrapper provider for wrapping individual elements.
         /// </summary>
         /// <param name="source">The <see cref="IEnumerable{T}"/> instance to get the enumerator from.</param>
-        /// <param name="wrapperProvider">The wrapper provider for wrapping individual elements.</param>
-        public DelegatingEnumerable([NotNull] IEnumerable<TDeclared> source, IWrapperProvider wrapperProvider)
+        /// <param name="elementWrapperProvider">The wrapper provider for wrapping individual elements.</param>
+        public DelegatingEnumerable([NotNull] IEnumerable<TDeclared> source, IWrapperProvider elementWrapperProvider)
         {
             _source = source;
-            _wrapperProvider = wrapperProvider;
+            _wrapperProvider = elementWrapperProvider;
         }
 
         /// <summary>
@@ -55,7 +55,9 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         /// <summary>
-        /// This method is not implemented but is required method for serialization to work. Do not use.
+        /// The serializer requires every type it encounters can be serialized and deserialized.
+        /// This type will never be used for deserialization, but we are required to implement the add
+        /// method so that the type can be serialized. This will never be called.
         /// </summary>
         /// <param name="item">The item to add. Unused.</param>
         public void Add(object item)

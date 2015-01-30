@@ -11,18 +11,6 @@ namespace Microsoft.AspNet.Mvc.Xml
     /// </summary>
     public class SerializableErrorWrapperProvider : IWrapperProvider
     {
-        private readonly WrapperProviderContext _context;
-
-        /// <summary>
-        /// Initializes a <see cref="SerializableErrorWrapperProvider"/> with 
-        /// the <see cref="WrapperProviderContext"/>
-        /// </summary>
-        /// <param name="context">The <see cref="WrapperProviderContext"/></param>
-        public SerializableErrorWrapperProvider([NotNull] WrapperProviderContext context)
-        {
-            _context = context;
-        }
-
         /// <inheritdoc />
         public Type WrappingType
         {

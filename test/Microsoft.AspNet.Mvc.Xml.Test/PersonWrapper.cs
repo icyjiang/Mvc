@@ -2,10 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using XmlFormattersWebSite.Models;
-using Microsoft.AspNet.Mvc.Xml;
 
-namespace XmlFormattersWebSite
+namespace Microsoft.AspNet.Mvc.Xml
 {
     public class PersonWrapper : IUnwrappable
     {
