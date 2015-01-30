@@ -123,6 +123,15 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <returns>The type to which the XML will be deserialized.</returns>
         protected virtual Type GetSerializableType([NotNull] Type declaredType)
         {
+            IWrapperProvider wrapperProvider = FormattingUtilities.GetWrapperProvider(
+                                                    _wrapperProviderFactories,
+                                                    new WrapperProviderContext(declaredType, isSerialization: false));
+
+            if (wrapperProvider != null && wrapperProvider.WrappingType != null)
+            {
+                return wrapperProvider.WrappingType;
+            }
+
             return declaredType;
         }
 
@@ -163,17 +172,6 @@ namespace Microsoft.AspNet.Mvc.Xml
             using (var xmlReader = CreateXmlReader(new DelegatingStream(request.Body)))
             {
                 var type = GetSerializableType(context.ModelType);
-
-                IWrapperProvider wrapperProvider = FormattingUtilities.GetWrapperProvider(
-                                                                _wrapperProviderFactories,
-                                                                new WrapperProviderContext(
-                                                                                        declaredType: type,
-                                                                                        isSerialization: false));
-
-                if (wrapperProvider != null && wrapperProvider.WrappingType != null)
-                {
-                    type = wrapperProvider.WrappingType;
-                }
 
                 var serializer = CreateSerializer(type);
 
