@@ -197,7 +197,7 @@ namespace Microsoft.AspNet.Mvc.Xml
                     type = wrapperProvider.WrappingType;
                 }
 
-                var serializer = CreateDataContractSerializer(type);
+                var serializer = CreateSerializer(type);
 
                 var deserializedObject = serializer.ReadObject(xmlReader);
 

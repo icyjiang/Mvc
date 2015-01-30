@@ -123,7 +123,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <returns>The type to which the XML will be deserialized.</returns>
         protected virtual Type GetSerializableType([NotNull] Type declaredType)
         {
-            return SerializableErrorWrapper.CreateSerializableType(declaredType);
+            return declaredType;
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// Called during deserialization to get the <see cref="XmlSerializer"/>.
         /// </summary>
         /// <returns>The <see cref="XmlSerializer"/> used during deserialization.</returns>
-        protected virtual XmlSerializer CreateXmlSerializer(Type type)
+        protected virtual XmlSerializer CreateSerializer(Type type)
         {
             return new XmlSerializer(type);
         }
@@ -175,7 +175,7 @@ namespace Microsoft.AspNet.Mvc.Xml
                     type = wrapperProvider.WrappingType;
                 }
 
-                var serializer = CreateXmlSerializer(type);
+                var serializer = CreateSerializer(type);
 
                 var deserializedObject = serializer.Deserialize(xmlReader);
 

@@ -15,8 +15,8 @@ namespace Microsoft.AspNet.Mvc.Xml
         [Theory]
         [InlineData(typeof(IEnumerable<SerializableError>),
             typeof(DelegatingEnumerable<SerializableErrorWrapper, SerializableError>))]
-        //[InlineData(typeof(IQueryable<SerializableError>),
-        //    typeof(DelegatingEnumerable<SerializableErrorWrapper, SerializableError>))]
+        [InlineData(typeof(IQueryable<SerializableError>),
+            typeof(DelegatingEnumerable<SerializableErrorWrapper, SerializableError>))]
         [InlineData(typeof(ICollection<SerializableError>),
             typeof(DelegatingEnumerable<SerializableErrorWrapper, SerializableError>))]
         [InlineData(typeof(IList<SerializableError>),
