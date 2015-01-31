@@ -21,7 +21,6 @@ namespace Microsoft.AspNet.Mvc.Xml
     public class XmlSerializerInputFormatter : IInputFormatter
     {
         private readonly XmlDictionaryReaderQuotas _readerQuotas = FormattingUtilities.GetDefaultXmlReaderQuotas();
-        private IList<IWrapperProviderFactory> _wrapperProviderFactories;
 
         /// <summary>
         /// Initializes a new instance of XmlSerializerInputFormatter.
@@ -37,36 +36,20 @@ namespace Microsoft.AspNet.Mvc.Xml
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/xml"));
 
             WrapperProviderFactories = new List<IWrapperProviderFactory>();
-            WrapperProviderFactories.Add(new EnumerableWrapperProviderFactory(WrapperProviderFactories));
             WrapperProviderFactories.Add(new SerializableErrorWrapperProviderFactory());
         }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="IWrapperProviderFactory"/> to
+        /// Gets the list of <see cref="IWrapperProviderFactory"/> to
         /// provide the wrapping type for de-serialization.
         /// </summary>
-        public IList<IWrapperProviderFactory> WrapperProviderFactories
-        {
-            get
-            {
-                return _wrapperProviderFactories;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                _wrapperProviderFactories = value;
-            }
-        }
+        public IList<IWrapperProviderFactory> WrapperProviderFactories { get; }
 
         /// <inheritdoc />
-        public IList<MediaTypeHeaderValue> SupportedMediaTypes { get; private set; }
+        public IList<MediaTypeHeaderValue> SupportedMediaTypes { get; }
 
         /// <inheritdoc />
-        public IList<Encoding> SupportedEncodings { get; private set; }
+        public IList<Encoding> SupportedEncodings { get; }
 
         /// <summary>
         /// Indicates the acceptable input XML depth.
@@ -123,15 +106,10 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <returns>The type to which the XML will be deserialized.</returns>
         protected virtual Type GetSerializableType([NotNull] Type declaredType)
         {
-            IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
+            var wrapperProvider = WrapperProviderFactories.GetWrapperProvider(
                                                     new WrapperProviderContext(declaredType, isSerialization: false));
 
-            if (wrapperProvider != null && wrapperProvider.WrappingType != null)
-            {
-                return wrapperProvider.WrappingType;
-            }
-
-            return declaredType;
+            return wrapperProvider?.WrappingType ?? declaredType;
         }
 
         /// <summary>
@@ -179,7 +157,7 @@ namespace Microsoft.AspNet.Mvc.Xml
                 // Unwrap only if the original type was wrapped.
                 if (type != context.ModelType)
                 {
-                    IUnwrappable unwrappable = deserializedObject as IUnwrappable;
+                    var unwrappable = deserializedObject as IUnwrappable;
                     if (unwrappable != null)
                     {
                         deserializedObject = unwrappable.Unwrap(declaredType: context.ModelType);

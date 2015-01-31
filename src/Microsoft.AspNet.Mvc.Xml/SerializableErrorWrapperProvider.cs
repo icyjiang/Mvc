@@ -21,12 +21,16 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         /// <inheritdoc />
-        public object Wrap(object original)
+        public object Wrap([NotNull] object original)
         {
             var error = original as SerializableError;
             if (error == null)
             {
-                return original;
+                throw new ArgumentException(
+                    Resources.FormatWrapperProvider_MismatchType(
+                        typeof(SerializableErrorWrapper).Name, 
+                        original.GetType().Name), 
+                    nameof(original));
             }
 
             return new SerializableErrorWrapper(error);

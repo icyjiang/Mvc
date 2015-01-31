@@ -11,7 +11,7 @@ namespace Microsoft.AspNet.Mvc.Xml
             = new ResourceManager("Microsoft.AspNet.Mvc.Xml.Resources", typeof(Resources).GetTypeInfo().Assembly);
 
         /// <summary>
-        /// Invalid argument supplied to parameter '{0}'. The expected argument for this parameter is a type which is an interface and implements IEnumerable&lt;T&gt;.
+        /// The type must be an interface and must be or derive from '{0}'.
         /// </summary>
         internal static string EnumerableWrapperProvider_InvalidSourceEnumerableOfT
         {
@@ -19,11 +19,27 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         /// <summary>
-        /// Invalid argument supplied to parameter '{0}'. The expected argument for this parameter is a type which is an interface and implements IEnumerable&lt;T&gt;.
+        /// The type must be an interface and must be or derive from '{0}'.
         /// </summary>
         internal static string FormatEnumerableWrapperProvider_InvalidSourceEnumerableOfT(object p0)
         {
             return string.Format(CultureInfo.CurrentCulture, GetString("EnumerableWrapperProvider_InvalidSourceEnumerableOfT"), p0);
+        }
+
+        /// <summary>
+        /// The object to be wrapped must be of type '{0}' but was of type '{1}'.
+        /// </summary>
+        internal static string WrapperProvider_MismatchType
+        {
+            get { return GetString("WrapperProvider_MismatchType"); }
+        }
+
+        /// <summary>
+        /// The object to be wrapped must be of type '{0}' but was of type '{1}'.
+        /// </summary>
+        internal static string FormatWrapperProvider_MismatchType(object p0, object p1)
+        {
+            return string.Format(CultureInfo.CurrentCulture, GetString("WrapperProvider_MismatchType"), p0, p1);
         }
 
         private static string GetString(string name, params string[] formatterNames)

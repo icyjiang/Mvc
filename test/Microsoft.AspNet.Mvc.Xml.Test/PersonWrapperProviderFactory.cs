@@ -9,7 +9,7 @@ namespace Microsoft.AspNet.Mvc.Xml
     {
         public IWrapperProvider GetProvider(WrapperProviderContext context)
         {
-            if(context.DeclaredType == typeof(Person))
+            if (context.DeclaredType == typeof(Person))
             {
                 return new PersonWrapperProvider();
             }

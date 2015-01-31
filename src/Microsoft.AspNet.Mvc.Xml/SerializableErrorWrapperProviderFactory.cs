@@ -17,7 +17,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// </summary>
         /// <param name="context"></param>
         /// <returns>An instance of <see cref="SerializableErrorWrapperProvider"/> if the provided 
-        /// declared type is <see cref="Microsoft.AspNet.Mvc.SerializableError"/>, else null.</returns>
+        /// declared type is <see cref="Microsoft.AspNet.Mvc.SerializableError"/>, else <c>null</c>.</returns>
         public IWrapperProvider GetProvider([NotNull] WrapperProviderContext context)
         {
             if (context.DeclaredType == typeof(SerializableError))

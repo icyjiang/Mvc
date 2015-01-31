@@ -17,7 +17,6 @@ namespace Microsoft.AspNet.Mvc.Xml
     /// </summary>
     public class XmlDataContractSerializerOutputFormatter : OutputFormatter
     {
-        private IList<IWrapperProviderFactory> _wrapperProviderFactories;
         private DataContractSerializerSettings _serializerSettings;
 
         /// <summary>
@@ -51,25 +50,10 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="IWrapperProviderFactory"/> to
-        /// wrap the objects being serialized.
+        /// Gets the list of <see cref="IWrapperProviderFactory"/> to
+        /// provide the wrapping type for serialization.
         /// </summary>
-        public IList<IWrapperProviderFactory> WrapperProviderFactories
-        {
-            get
-            {
-                return _wrapperProviderFactories;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                _wrapperProviderFactories = value;
-            }
-        }
+        public IList<IWrapperProviderFactory> WrapperProviderFactories { get; }
 
         /// <summary>
         /// Gets the settings to be used by the XmlWriter.
@@ -114,21 +98,16 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         /// <summary>
-        /// 
+        /// Gets the type to be serialized.
         /// </summary>
         /// <param name="type">The original type to be serialized</param>
         /// <returns>The original or wrapped type provided by any <see cref="IWrapperProvider"/>s.</returns>
         protected virtual Type GetSerializableType(Type type)
         {
-            IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
+            var wrapperProvider = WrapperProviderFactories.GetWrapperProvider(
                                                         new WrapperProviderContext(type, isSerialization: true));
 
-            if (wrapperProvider != null && wrapperProvider.WrappingType != null)
-            {
-                return wrapperProvider.WrappingType;
-            }
-
-            return type;
+            return wrapperProvider?.WrappingType ?? type;
         }
 
         /// <inheritdoc />
@@ -195,7 +174,7 @@ namespace Microsoft.AspNet.Mvc.Xml
                 // Wrap the object only if there is a wrapping type.
                 if (wrappingType != null && wrappingType != resolvedType)
                 {
-                    IWrapperProvider wrapperProvider = _wrapperProviderFactories.GetWrapperProvider(
+                    var wrapperProvider = WrapperProviderFactories.GetWrapperProvider(
                                                             new WrapperProviderContext(
                                                                                 declaredType: resolvedType,
                                                                                 isSerialization: true));

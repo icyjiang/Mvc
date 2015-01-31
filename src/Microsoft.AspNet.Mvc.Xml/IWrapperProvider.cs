@@ -11,17 +11,15 @@ namespace Microsoft.AspNet.Mvc.Xml
     public interface IWrapperProvider
     {
         /// <summary>
-        /// Gets the type which wraps the given type.
+        /// Gets the wrapping type.
         /// </summary>
-        /// <param name="declaredType">The declared type which needs to be wrapped.</param>
-        /// <returns>The wrapping type if the provider decides to wrap the given type, else null.</returns>
         Type WrappingType { get; }
 
         /// <summary>
         /// Wraps the given object to the wrapping type provided by <see cref="WrappingType"/>.
         /// </summary>
-        /// <param name="original">The original non-wrapped object</param>
-        /// <returns></returns>
+        /// <param name="original">The original non-wrapped object.</param>
+        /// <returns>Returns a wrapped object.</returns>
         object Wrap(object original);
     }
 }

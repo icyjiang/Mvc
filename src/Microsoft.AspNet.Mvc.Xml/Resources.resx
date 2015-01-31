@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EnumerableWrapperProvider_InvalidSourceEnumerableOfT" xml:space="preserve">
-    <value>Invalid argument supplied to parameter '{0}'. The expected argument for this parameter is a type which is an interface and implements IEnumerable&lt;T&gt;.</value>
+    <value>The type must be an interface and must be or derive from '{0}'.</value>
+  </data>
+  <data name="WrapperProvider_MismatchType" xml:space="preserve">
+    <value>The object to be wrapped must be of type '{0}' but was of type '{1}'.</value>
   </data>
 </root>

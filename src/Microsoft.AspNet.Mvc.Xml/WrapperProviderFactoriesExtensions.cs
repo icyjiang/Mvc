@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.AspNet.Mvc.Xml
 {
+    /// <summary>
+    /// Extension methods for <see cref="IWrapperProviderFactory"/>.
+    /// </summary>
     public static class WrapperProviderFactoriesExtensions
     {
         /// <summary>

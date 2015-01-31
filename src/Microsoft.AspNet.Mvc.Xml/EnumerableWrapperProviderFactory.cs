@@ -19,7 +19,7 @@ namespace Microsoft.AspNet.Mvc.Xml
         /// <see cref="IWrapperProviderFactory"/>.
         /// </summary>
         /// <param name="wrapperProviderFactories">List of <see cref="IWrapperProviderFactory"/>.</param>
-        public EnumerableWrapperProviderFactory(IEnumerable<IWrapperProviderFactory> wrapperProviderFactories)
+        public EnumerableWrapperProviderFactory([NotNull] IEnumerable<IWrapperProviderFactory> wrapperProviderFactories)
         {
             _wrapperProviderFactories = wrapperProviderFactories;
         }
@@ -39,17 +39,21 @@ namespace Microsoft.AspNet.Mvc.Xml
 
                 // We only wrap interfaces types(ex: IEnumerable<T>, IQueryable<T>, IList<T> etc.) and not
                 // concrete types like List<T>, Collection<T> which implement IEnumerable<T>.
-                Type elementType;
-                var enumerableOfT = EnumerableWrapperProvider.GetIEnumerableOfT(declaredType, out elementType);
-                if(enumerableOfT != null)
+                if (declaredType != null && declaredType.IsInterface() && declaredType.IsGenericType())
                 {
-                    var wrapperProviderContext = new WrapperProviderContext(
+                    var enumerableOfT = declaredType.ExtractGenericInterface(typeof(IEnumerable<>));
+                    if (enumerableOfT != null)
+                    {
+                        var elementType = enumerableOfT.GetGenericArguments()[0];
+
+                        var wrapperProviderContext = new WrapperProviderContext(
                                                                     elementType,
                                                                     context.IsSerialization);
 
-                    var elementWrapperProvider = _wrapperProviderFactories.GetWrapperProvider(wrapperProviderContext);
+                        var elementWrapperProvider = _wrapperProviderFactories.GetWrapperProvider(wrapperProviderContext);
 
-                    return new EnumerableWrapperProvider(enumerableOfT, elementWrapperProvider);
+                        return new EnumerableWrapperProvider(enumerableOfT, elementWrapperProvider);
+                    }
                 }
             }
 

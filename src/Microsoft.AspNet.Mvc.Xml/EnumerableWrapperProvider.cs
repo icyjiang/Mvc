@@ -27,22 +27,25 @@ namespace Microsoft.AspNet.Mvc.Xml
             [NotNull] Type sourceEnumerableOfT,
             IWrapperProvider elementWrapperProvider)
         {
-            Type declaredElementType;
-            if (GetIEnumerableOfT(sourceEnumerableOfT, out declaredElementType) == null)
+            var enumerableOfT = sourceEnumerableOfT.ExtractGenericInterface(typeof(IEnumerable<>));
+            if (!sourceEnumerableOfT.IsInterface() || enumerableOfT == null)
             {
                 throw new ArgumentException(
-                    Resources.FormatEnumerableWrapperProvider_InvalidSourceEnumerableOfT(nameof(sourceEnumerableOfT)));
+                    Resources.FormatEnumerableWrapperProvider_InvalidSourceEnumerableOfT(typeof(IEnumerable<>).Name), 
+                    nameof(sourceEnumerableOfT));
             }
 
             _wrapperProvider = elementWrapperProvider;
 
+            var declaredElementType = enumerableOfT.GetGenericArguments()[0];
             var wrappedElementType = elementWrapperProvider?.WrappingType ?? declaredElementType;
-
             WrappingType = typeof(DelegatingEnumerable<,>).MakeGenericType(wrappedElementType, declaredElementType);
 
-            _wrappingTypeConstructor = WrappingType.GetConstructor(new[] {
-                                                            sourceEnumerableOfT,
-                                                            typeof(IWrapperProvider) });
+            _wrappingTypeConstructor = WrappingType.GetConstructor(new[]
+            {
+                sourceEnumerableOfT,
+                typeof(IWrapperProvider)
+            });
         }
 
         /// <inheritdoc />
@@ -60,22 +63,6 @@ namespace Microsoft.AspNet.Mvc.Xml
             }
 
             return _wrappingTypeConstructor.Invoke(new object[] { original, _wrapperProvider });
-        }
-
-        public static Type GetIEnumerableOfT(Type declaredType, out Type elementType)
-        {
-            elementType = null;
-            if (declaredType != null && declaredType.IsInterface() && declaredType.IsGenericType())
-            {
-                var enumerableOfT = declaredType.ExtractGenericInterface(typeof(IEnumerable<>));
-                if(enumerableOfT != null)
-                {
-                    elementType = enumerableOfT.GetGenericArguments()[0];
-                    return enumerableOfT;
-                }
-            }
-
-            return null;
         }
     }
 }

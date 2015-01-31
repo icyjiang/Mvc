@@ -47,31 +47,30 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal(expectedBody, actualBody);
         }
 
-        //[Theory]
-        //[InlineData("http://localhost/SerializableError/CreateEmployee",
-        //    "application/json",
-        //    "{\"employee.Id\":[\"" + sampleIntError + "\"]," +
-        //    "\"employee.Name\":" +
-        //    "[\"" + sampleStringError + "\"]}")]
-        //public async Task SerializableErrorIsReturnedInExpectedFormat(string url, string acceptHeader, string output)
-        //{
-        //    // Arrange
-        //    var server = TestServer.Create(_provider, _app);
-        //    var client = server.CreateClient();
+        [Fact]
+        public async Task SerializableErrorIsReturnedInExpectedFormat()
+        {
+            // Arrange
+            var server = TestServer.Create(_provider, _app);
+            var client = server.CreateClient();
 
-        //    var input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-        //        "<Employee xmlns=\"http://schemas.datacontract.org/2004/07/XmlFormattersWebSite\">" +
-        //        "<Id>2</Id><Name>foo</Name></Employee>";
-        //    var request = new HttpRequestMessage(HttpMethod.Post, url);
-        //    request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(acceptHeader));
-        //    request.Content = new StringContent(input, Encoding.UTF8, "application/xml");
+            var input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<Employee xmlns=\"http://schemas.datacontract.org/2004/07/FormatterWebSite\">" +
+                "<Id>2</Id><Name>foo</Name></Employee>";
 
-        //    // Act
-        //    var response = await client.SendAsync(request);
+            var expectedOutput = "{\"employee.Id\":[\"The field SampleInt must be between 10 and 100." +
+                    "\"],\"employee.Name\":[\"The field SampleString must be a string or array type with" +
+                    " a minimum length of '15'.\"]}";
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/SerializableError/CreateEmployee");
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+            request.Content = new StringContent(input, Encoding.UTF8, "application/xml");
 
-        //    // Assert
-        //    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        //    Assert.Equal(output, await response.Content.ReadAsStringAsync());
-        //}
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(expectedOutput, await response.Content.ReadAsStringAsync());
+        }
     }
 }

@@ -43,12 +43,13 @@ namespace Microsoft.AspNet.Mvc.Xml
             error2.Add("key1", "key1-error");
             var errors = new[] { error1, error2 };
             var delegatingEnumerable = new DelegatingEnumerable<SerializableErrorWrapper, SerializableError>(
-                                                    errors, new SerializableErrorWrapperProvider());
+                                                    errors, 
+                                                    new SerializableErrorWrapperProvider());
 
             // Act and Assert
             Assert.Equal(errors.Length, delegatingEnumerable.Count());
 
-            for (int i = 0; i < errors.Length; i++)
+            for (var i = 0; i < errors.Length; i++)
             {
                 var errorWrapper = delegatingEnumerable.ElementAt(i);
 
