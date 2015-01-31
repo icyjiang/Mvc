@@ -35,7 +35,7 @@ namespace Microsoft.AspNet.Mvc.Xml
             Assert.NotNull(wrappingType);
             Assert.Equal(expectedType, wrappingType);
         }
-        
+
         [Fact]
         public void Wraps_EmptyCollections()
         {
@@ -72,7 +72,7 @@ namespace Microsoft.AspNet.Mvc.Xml
             Assert.Equal(typeof(DelegatingEnumerable<int, int>), wrapperProvider.WrappingType);
             Assert.Null(wrapped);
         }
-        
+
         [Theory]
         [InlineData(typeof(string))]
         [InlineData(typeof(List<int>))]
@@ -82,13 +82,12 @@ namespace Microsoft.AspNet.Mvc.Xml
         public void ThrowsArugmentExceptionFor_ConcreteEnumerableOfT(Type declaredType)
         {
             // Arrange
-            var expectedMessage = "Invalid argument supplied to parameter 'sourceEnumerableOfT'." +
-                                  " The expected argument for this parameter is a type which is " + 
-                                  "an interface and implements IEnumerable<T>.";
+            var expectedMessage = "The type must be an interface and must be or derive from 'IEnumerable`1'." +
+                                  "\r\nParameter name: sourceEnumerableOfT";
 
             // Act and Assert
             var ex = Assert.Throws<ArgumentException>(() => new EnumerableWrapperProvider(
-                                                                            declaredType, 
+                                                                            declaredType,
                                                                             elementWrapperProvider: null));
 
             Assert.Equal(expectedMessage, ex.Message);

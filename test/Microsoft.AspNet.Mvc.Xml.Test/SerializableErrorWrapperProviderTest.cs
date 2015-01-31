@@ -39,30 +39,18 @@ namespace Microsoft.AspNet.Mvc.Xml
         }
 
         [Fact]
-        public void DoesNotWrap_NullInstance()
-        {
-            // Arrange
-            var wrapperProvider = new SerializableErrorWrapperProvider();
-            
-            // Act
-            var wrapped = wrapperProvider.Wrap(null);
-
-            // Assert
-            Assert.Null(wrapped);
-        }
-
-        [Fact]
-        public void DoesNotWrap_NonSerializableErrorInstances()
+        public void ThrowsExceptionOn_NonSerializableErrorInstances()
         {
             // Arrange
             var wrapperProvider = new SerializableErrorWrapperProvider();
             var person = new Person() { Id = 10, Name = "John" };
+            var expectedMessage = string.Format("The object to be wrapped must be of type '{0}'" +
+                                    " but was of type 'Person'.\r\nParameter name: original", 
+                                    typeof(SerializableErrorWrapper).Name);
 
-            // Act
-            var wrapped = wrapperProvider.Wrap(person);
-
-            // Assert
-            Assert.Same(person, wrapped);
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => wrapperProvider.Wrap(person));
+            Assert.Equal(expectedMessage, exception.Message);
         }
     }
 }
